@@ -1,18 +1,12 @@
-// The Vue build version to load with the `import` command
-// (runtime-only or standalone) has been set in webpack.base.conf with an alias.
-import Vue from 'vue'
-import Vuex from 'vuex'
-
-import App from './App'
-
-Vue.use(Vuex)
-
+<script>
 const MILLISECONDS_SECOND = 1000;
 const MILLISECONDS_MINUTE = 60 * MILLISECONDS_SECOND;
 const MILLISECONDS_HOUR = 60 * MILLISECONDS_MINUTE;
 const MILLISECONDS_DAY = 24 * MILLISECONDS_HOUR;
 
-const MyCountdown = {
+export default {
+    name: "countdown",
+
   data() {
     return {
       count: 0,
@@ -225,27 +219,5 @@ const MyCountdown = {
       }
     },
   },
-
-}
-
-Vue.component('countdown', MyCountdown)
-
-
-
-const store = new Vuex.Store({
-  state: {
-      isAmbient: false,
-      hr: 123
-  },
-  mutations: {
-  }
-})
-
-
-
-Vue.config.productionTip = false
-
-new Vue({
-    store,
-    render: h => h(App)
-}).$mount('#app')
+};
+</script>

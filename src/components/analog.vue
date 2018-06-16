@@ -1,15 +1,15 @@
 <template>
 <div id="analog-clock">
-  <div class="clock">
-    <div class="steps"></div>
+  <div class="clock"  v-bind:class="{ambient: isAmbient}">
+    <div class="steps a"></div>
     <div class="steps"></div>  
     <div class="steps"></div>
+    <div class="steps a"></div>
     <div class="steps"></div>
     <div class="steps"></div>
-    <div class="steps"></div>
-    <div class="hour" v-bind:style="{transform: 'rotate(' + hourDeg + ')'}"></div>
-    <div class="min" v-bind:style="{transform: 'rotate(' + minsDeg + ')'}"></div>
-    <div v-if="!isAmbient" class="sec" v-bind:style="{transform: 'rotate(' + secsDeg + ')'}"></div>
+    <div class="hour" v-bind:style="{transform: 'rotate(' + hourDeg + 'deg)'}"></div>
+    <div class="min" v-bind:style="{transform: 'rotate(' + minsDeg + 'deg)'}"></div>
+    <div v-if="!isAmbient" class="sec" v-bind:style="{transform: 'rotate(' + secsDeg + 'deg)'}"></div>
   </div>
 </div>
 </template>
@@ -54,9 +54,9 @@ export default {
                     min = date.getMinutes(),
                     sec = date.getSeconds();
 
-               t.hourDeg =t.percentageToDegree(t.numberToPercentage(hour, 24) ) + 'deg';
-               t.minsDeg =t.percentageToDegree(t.numberToPercentage(min, 60)  ) + 'deg';
-               t.secsDeg =t.percentageToDegree(t.numberToPercentage(sec, 60)  ) + 'deg';
+               t.hourDeg =t.percentageToDegree( t.numberToPercentage(hour, 24) );
+               t.minsDeg =t.percentageToDegree( t.numberToPercentage(min, 60) );
+               t.secsDeg =t.percentageToDegree( t.numberToPercentage(sec, 60) );
             }
             return u;
         }
@@ -86,7 +86,10 @@ $black: #000;
 $background: transparent;
 $clock-col: rgb(200, 200, 200);
 $accent-col: rgb(222, 222, 222);;
-$dOpacity: .3;
+$dOpacity: .6;
+$stepColor: rgb(255, 131, 0);
+$stepColor1: transparent;
+$ambientStepColor: rgb(109, 109, 109);
 
 *, *::before, *::after{
   box-sizing: border-box;
@@ -106,16 +109,16 @@ $dOpacity: .3;
     height: 360px;
     border-radius: 50%;
     &:before{
-        z-index: 3;
         content: '';
         position: absolute;
         top: 50%;
         left: 50%;
-        width: 10px;
-        height: 10px;
+        width: 40px;
+        height: 40px;
         transform: translate(-50%, -50%);
-        background: #999999;
+        z-index: 99;
         border-radius: 50%;
+        background-color: black;
     }
     .steps{
         position: absolute;
@@ -124,15 +127,14 @@ $dOpacity: .3;
         margin-left: -2px;
         height: 100%;
         width: 4px;
-        opacity: $dOpacity;
         &:before, &::after{
             content: '';
             position: absolute;
-            left: -3px;
-            width: 10px;
+            left: 2px;
+            width: 1px;
             height: 10px;
-            background: $clock-col;
-            border-radius: 50%;
+            background: $stepColor1;
+            border-radius: 1px;
             opacity: $dOpacity;
         }
           &::before{
@@ -143,7 +145,7 @@ $dOpacity: .3;
           }
           &:nth-child(1){
               &::before, &::after{
-                  background: $accent-col;
+                  background: $stepColor;
               }
           }
           &:nth-child(2){ transform: rotate(30deg); }
@@ -151,11 +153,12 @@ $dOpacity: .3;
           &:nth-child(4){ 
               transform: rotate(90deg);
               &::before, &::after{
-                  background: $accent-col;
+                  background: $stepColor;
               }
           }
           &:nth-child(5){ transform: rotate(120deg); }
           &:nth-child(6){ transform: rotate(150deg); }
+
       }
       .display{
           position: absolute;
@@ -175,18 +178,30 @@ $dOpacity: .3;
           bottom: 50%;
           left: 50%;
           height: 40%;
-          width: 4px;
-          margin-left: -2px;
+          width: 3px;
+          margin-left: -1.5px;
           background: $accent-col;
           transform-origin: bottom center;
           border-radius: 3px 3px 0 0;
       }
+      .sec {
+          width: 1px;
+          margin-left: 0px
+      }
       .hour{
-          height: 30%;
+          height: 23%;
       }
       .sec{
           height: 46%;
           background: $clock-col;
+      }
+      &.ambient {
+          .a {
+              &:before, &::after{
+                  background-color: $ambientStepColor;
+
+              }
+          }
       }
   }
 

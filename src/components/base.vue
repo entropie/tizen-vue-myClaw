@@ -1,9 +1,9 @@
 <template>
 <div id="clocks">
-
   <digital-clock v-if="showDigitalClock"></digital-clock>
   <analog-clock v-if="showAnalogCLock"></analog-clock>
   <heart-rate v-if="showHeartRate"></heart-rate>
+  <clock-controls v-if="showClockControls"></clock-controls>
 </div>
 </template>
 
@@ -12,6 +12,7 @@
 import DigitalClock from './digital.vue'
 import AnalogClock from './analog.vue'
 import HeartRate from './heart-rate.vue'
+import ClockControls from './clock-controls.vue'
 
 export default {
     name: "base-clock"
@@ -20,11 +21,12 @@ export default {
             showHeartRate: false,
             showAnalogCLock: true,
             showDigitalClock: true,
+            showClockControls: true,
             time: this.tizenTime()
         }
     }
     , components: {
-        DigitalClock, AnalogClock, HeartRate
+        DigitalClock, AnalogClock, HeartRate, ClockControls
     }
     , created() {
         this.addListener();

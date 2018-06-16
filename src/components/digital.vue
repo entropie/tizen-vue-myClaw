@@ -38,6 +38,11 @@ export default {
             return this.$store.state.isAmbient;
         }
     }
+    , watch: {
+        isAmbient(o, n) {
+            this.clockUpdater(this)();
+        }
+    }
     , methods: {
         now() {
             console.log(moment(this.$parent.time));
@@ -60,7 +65,7 @@ export default {
 
         }
         , numberToImage: function(n, green, size) {
-            let add = green ? "grey" : "grey"
+            let add = green ? "" : "grey"
             if(this.isAmbient)
                 add = "grey"
 
@@ -104,6 +109,7 @@ export default {
     z-index: 5;
     width: 360px;
     top: 55%;
+    text-align: center;
 }
 
 .secs img {
