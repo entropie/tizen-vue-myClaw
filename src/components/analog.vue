@@ -1,15 +1,32 @@
 <template>
 <div id="analog-clock">
   <div class="clock"  v-bind:class="{ambient: isAmbient}">
-    <div class="steps a"></div>
-    <div class="steps"></div>  
-    <div class="steps"></div>
-    <div class="steps a"></div>
-    <div class="steps"></div>
-    <div class="steps"></div>
-    <div class="hour" v-bind:style="{transform: 'rotate(' + hourDeg + 'deg)'}"></div>
-    <div class="min" v-bind:style="{transform: 'rotate(' + minsDeg + 'deg)'}"></div>
-    <div v-if="!isAmbient" class="sec" v-bind:style="{transform: 'rotate(' + secsDeg + 'deg)'}"></div>
+
+    <div class="numbers">
+      <div class="nr" v-for="n in numbers">
+        <span>{{ n }}</span>
+      </div>
+    </div>
+
+    <div class="stepsbox">
+      <div class="steps a"></div>
+      <div class="steps"></div>  
+      <div class="steps"></div>
+      <div class="steps a"></div>
+      <div class="steps"></div>
+      <div class="steps"></div>
+    </div>
+
+    <div class="chBg hourBg" v-bind:class="{ isAmbient }" v-bind:style="{transform: 'rotate(' + hourDeg + 'deg)'}"></div>
+    <div class="hour" v-bind:class="{ isAmbient }" v-bind:style="{transform: 'rotate(' + hourDeg + 'deg)'}"></div>
+
+    <div class="chBg minBg" v-bind:class="{ isAmbient }" v-bind:style="{transform: 'rotate(' + minsDeg + 'deg)'}"></div>
+    <div class="min" v-bind:class="{ isAmbient }" v-bind:style="{transform: 'rotate(' + minsDeg + 'deg)'}"></div>
+
+    <div v-if="!isAmbient" class="chBg secBg" v-bind:style="{transform: 'rotate(' + secsDeg + 'deg)'}"></div>
+    <div v-if="!isAmbient" v-bind:style="{transform: 'rotate(' + secsDeg + 'deg)'}" class="sec" ></div>
+
+
   </div>
 </div>
 </template>
@@ -30,15 +47,23 @@ export default {
             mins: '--',
             minsDeg: '0deg',
             secs: '--',
-            secsDeg: '0deg'
+            secsDeg: '0deg',
+            clockInterval: undefined,
+            numbers: [1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24]
+            
         }
     }
     , created(){
-        this.updateClock();
+        this.startClock();
     }
     , computed: {
         isAmbient: function() {
             return this.$store.state.isAmbient;
+        }
+    }
+    , beforeDestroy() {
+        if(this.clockInterval) {
+            clearInterval(this.clockInterval);
         }
     }
     , methods: {
@@ -54,9 +79,9 @@ export default {
                     min = date.getMinutes(),
                     sec = date.getSeconds();
 
-               t.hourDeg =t.percentageToDegree( t.numberToPercentage(hour, 24) );
-               t.minsDeg =t.percentageToDegree( t.numberToPercentage(min, 60) );
-               t.secsDeg =t.percentageToDegree( t.numberToPercentage(sec, 60) );
+                t.minsDeg =t.percentageToDegree( t.numberToPercentage(min, 60) + t.numberToPercentage(sec, 60)/60/24);
+                t.hourDeg =t.percentageToDegree( t.numberToPercentage(hour, 24)  + t.numberToPercentage(sec, 60)/24);
+                t.secsDeg =t.percentageToDegree( t.numberToPercentage(sec, 60) );
             }
             return u;
         }
@@ -67,8 +92,8 @@ export default {
         , percentageToDegree(percentage = 0) {
             return (percentage * 360) / 100;
         }
-        , updateClock(){
-            setInterval(this.clockUpdater(this), 1000);  
+        , startClock(){
+            this.clockInterval = setInterval(this.clockUpdater(this), 1000);  
         }
     }
 }
@@ -85,12 +110,27 @@ $white: #fff;
 $black: #000;
 $background: transparent;
 $clock-col: rgb(200, 200, 200);
-$accent-col: rgb(222, 222, 222);;
-$dOpacity: .6;
+$accentCol: rgba(0, 0, 0, .5);
+$shadowColor: rgba(13, 45, 15, .5);
+
+
+$dOpacity: 1;
 $stepColor: rgb(255, 131, 0);
 $stepColor1: transparent;
-$ambientStepColor: rgb(109, 109, 109);
 
+$highlightColor: rgb(116, 188, 45);
+$ambientColor: #AAA;
+$ambientStepColor: rgb(109, 109, 109);
+$ambientShadowColor: #555;
+
+$clockhandSecondColor: rgb(255, 187, 0);
+$clockhandSecondColorAmbient: rgb(104, 76, 0);
+
+$numbersColor: #333;
+
+$w: 360px;
+$h: 360px;
+        
 *, *::before, *::after{
   box-sizing: border-box;
 }
@@ -105,20 +145,59 @@ $ambientStepColor: rgb(109, 109, 109);
 
 .clock{
     position: relative;
-    width: 360px;
-    height: 360px;
+    width: $w;
+    height: $h;
     border-radius: 50%;
+    overflow: hidden;    
+    z-index: 10;
     &:before{
         content: '';
         position: absolute;
         top: 50%;
         left: 50%;
-        width: 40px;
-        height: 40px;
+        width: 20px;
+        height: 20px;
         transform: translate(-50%, -50%);
         z-index: 99;
         border-radius: 50%;
         background-color: black;
+    }
+    .stepsbox {
+        position: relative;
+        width: $w;
+        height: $h;
+        border-radius: 50%;
+        z-index: 25;
+    }
+    .numbers {
+        position: relative;
+        right: -50%;
+        z-index: 19;
+        .nr {
+            position: absolute;
+            height: $h/2;
+            transform-origin: 0 100%;
+            font-size: 18px;
+            font-family: monospace;
+
+            color: white;
+            padding-top: 30px;
+            width: 15px;
+            color: $numbersColor;
+            /* background-color: red; */
+            @each $n in 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25 {
+                $amt:360/24*$n - 2;
+                &:nth-child(#{$n}){
+                    transform: rotate($amt+deg);
+                    span{
+                        line-height: 1px;
+                        display:block;
+                        transform:rotate( (-$amt)+deg);
+                    }
+                }
+            }
+        }
+
     }
     .steps{
         position: absolute;
@@ -127,6 +206,7 @@ $ambientStepColor: rgb(109, 109, 109);
         margin-left: -2px;
         height: 100%;
         width: 4px;
+        z-index: 20;
         &:before, &::after{
             content: '';
             position: absolute;
@@ -169,6 +249,39 @@ $ambientStepColor: rgb(109, 109, 109);
           font-size: 2.6em;
           opacity: .5;
       }
+
+      .secBg, .minBg, .hourBg {
+          z-index: 99;
+          position: absolute;
+          bottom: 50%;
+          left: 50%;
+          height: 40%;
+          width: 4px;
+          margin-left: 4px;
+          transform-origin: bottom center;
+          border-radius: 3px 3px 0 0;
+          background-color: rgba($clockhandSecondColorAmbient, .2);
+          
+          z-index: 49;
+          &.isAmbient {
+              opacity: .3;
+          }
+      }
+      .minBg, .hourBg {
+          background-color: rgba($highlightColor, .3);
+      }
+
+
+
+      .secBg {
+          height: 47%;
+          margin-left: 2px;
+      }
+      .hourBg {
+          height: 24%;
+          width: 6px;
+          margin-left: 3px;
+      }
       .hour,
       .min,
       .sec{
@@ -178,22 +291,33 @@ $ambientStepColor: rgb(109, 109, 109);
           bottom: 50%;
           left: 50%;
           height: 40%;
-          width: 3px;
-          margin-left: -1.5px;
-          background: $accent-col;
+          width: 4px;
+          margin-left: -2px;
+          background: $accentCol;
           transform-origin: bottom center;
           border-radius: 3px 3px 0 0;
-      }
-      .sec {
-          width: 1px;
-          margin-left: 0px
+          z-index: 50;
+
+          &.isAmbient {
+              background-color: $ambientColor;
+              box-shadow: none;
+          }
+
       }
       .hour{
           height: 23%;
+          width: 6px;
+          margin-left: -3px;
+          box-shadow: 0 0 2px 2px $highlightColor;
+      }
+      .min{
+          box-shadow: 0 0 2px 2px $highlightColor;
       }
       .sec{
           height: 46%;
-          background: $clock-col;
+          width: 1px;
+          margin-left: 0;
+          box-shadow: 0 0 1px 1px $clockhandSecondColor;
       }
       &.ambient {
           .a {

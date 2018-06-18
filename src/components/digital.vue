@@ -21,6 +21,7 @@ export default {
     , data() {
         return {
             time: Date.now(),
+            clockInterval: undefined,
             min: "00",
             sec: "00",
             hour: "00",
@@ -36,6 +37,11 @@ export default {
     , computed: {
         isAmbient() {
             return this.$store.state.isAmbient;
+        }
+    }
+    , beforeDestroy() {
+        if(this.clockInterval) {
+            clearInterval(this.clockInterval);
         }
     }
     , watch: {
@@ -113,7 +119,8 @@ export default {
 }
 
 .secs img {
-    max-width: 32px
+    max-width: 32px;
+    z-index: 99;
 }
 
 </style>

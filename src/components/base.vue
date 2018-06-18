@@ -22,7 +22,14 @@ export default {
             showAnalogCLock: true,
             showDigitalClock: true,
             showClockControls: true,
-            time: this.tizenTime()
+            time: this.tizenTime(),
+            clockInterval: undefined,
+            sIndex: 0,
+            sets: [
+                { showAnalogCLock: true, showDigitalClock: true },
+                { showAnalogCLock: true, showDigitalClock: false },
+                { showAnalogCLock: false, showDigitalClock: true }
+            ]
         }
     }
     , components: {
@@ -30,9 +37,12 @@ export default {
     }
     , created() {
         this.addListener();
-        // setInterval(() => {
-        //     this.$store.state.isAmbient = true;
-        // }, 5000);
+        //this.setSet(this.sets[this.sIndex])
+    }
+    , beforeDestroy() {
+        if(this.clockInterval) {
+            clearInterval(this.clockInterval);
+        }
     }
     , methods: {
         tizenTime: function() {
@@ -40,22 +50,42 @@ export default {
                 return new Date();
             } else {
                 return tizen.time.getCurrentDateTime();
-                // return new Date();
             }
         }
         ,
 
+        changeClock: function() {
+            let newInd = this.sIndex += 1;
+            let set = this.sets[newInd];
+            if(!set) {
+                set = this.sets[0];
+            }
+
+            
+
+            this.setSet(set);
+        }
+        ,
+        setList: function() {
+            return Object.keys(this.sets);
+        }
+        ,
+        setSet: function(sv) {
+            if(!sv) return false;
+            this.sIndex = this.sets.indexOf(sv);
+            this.showDigitalClock = sv.showDigitalClock;
+            this.showAnalogCLock =  sv.showAnalogCLock;
+        }
+        ,
         addListener: function() {
             console.log("adding listener");
 
 
             let t = this;
 
-            setInterval(() => {
+            this.clockInterval = setInterval(() => {
                 t.time = t.tizenTime();
             }, 1000);
-
-
 
             document.addEventListener("timetick", function() {
                 t.time = t.tizenTime();
