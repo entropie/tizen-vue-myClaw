@@ -4,7 +4,7 @@
 
     <div class="numbers">
       <div class="nr" v-for="n in numbers">
-        <span>{{ n }}</span>
+        <span :class="'nr' + n">{{ n }}</span>
       </div>
     </div>
 
@@ -33,8 +33,6 @@
 
 
 <script>
-import moment from 'moment';
-
 // https://codepen.io/Paolo-Duzioni/pen/XeXdbm/
 export default {
     name: "analog-clock"
@@ -48,13 +46,11 @@ export default {
             minsDeg: '0deg',
             secs: '--',
             secsDeg: '0deg',
-            clockInterval: undefined,
-            numbers: [1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24]
+            numbers: [1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,0]
             
         }
     }
     , created(){
-        this.startClock();
     }
     , computed: {
         isAmbient: function() {
@@ -62,28 +58,18 @@ export default {
         }
     }
     , beforeDestroy() {
-        if(this.clockInterval) {
-            clearInterval(this.clockInterval);
-        }
     }
     , methods: {
-        now() {
-            return moment(this.$parent.time)
-        }
-        ,
-        clockUpdater(that) {
-            let u = function() {
-                let t = that;
-                var date = t.$parent.time,
-                    hour = date.getHours(),
-                    min = date.getMinutes(),
-                    sec = date.getSeconds();
+        clockUpdater() {
+            let t = this;
+            var date = t.$parent.time,
+                hour = date.getHours(),
+                min = date.getMinutes(),
+                sec = date.getSeconds();
 
-                t.minsDeg =t.percentageToDegree( t.numberToPercentage(min, 60) + t.numberToPercentage(sec, 60)/60/24);
-                t.hourDeg =t.percentageToDegree( t.numberToPercentage(hour, 24)  + t.numberToPercentage(sec, 60)/24);
-                t.secsDeg =t.percentageToDegree( t.numberToPercentage(sec, 60) );
-            }
-            return u;
+            t.minsDeg =t.percentageToDegree( t.numberToPercentage(min, 60) + t.numberToPercentage(sec, 60)/60/24);
+            t.hourDeg =t.percentageToDegree( t.numberToPercentage(hour, 24)  + t.numberToPercentage(min, 60)/24);
+            t.secsDeg =t.percentageToDegree( t.numberToPercentage(sec, 60) );
         }
         ,
         numberToPercentage(number = 0, max = 60) {
@@ -92,8 +78,8 @@ export default {
         , percentageToDegree(percentage = 0) {
             return (percentage * 360) / 100;
         }
-        , startClock(){
-            this.clockInterval = setInterval(this.clockUpdater(this), 1000);  
+        , update() {
+            this.clockUpdater();
         }
     }
 }
@@ -115,7 +101,7 @@ $shadowColor: rgba(13, 45, 15, .5);
 
 
 $dOpacity: 1;
-$stepColor: rgb(255, 131, 0);
+$stepColor: green;
 $stepColor1: transparent;
 
 $highlightColor: rgb(116, 188, 45);
@@ -126,7 +112,12 @@ $ambientShadowColor: #555;
 $clockhandSecondColor: rgb(255, 187, 0);
 $clockhandSecondColorAmbient: rgb(104, 76, 0);
 
-$numbersColor: #333;
+$numbersColor: green;
+$ambientNumbersColor: black;
+$numbersBackgroundColor: #222;
+$numbersAmbientBackgroundColor: #666;
+
+$nrFontSize: 10px;
 
 $w: 360px;
 $h: 360px;
@@ -177,24 +168,42 @@ $h: 360px;
             position: absolute;
             height: $h/2;
             transform-origin: 0 100%;
-            font-size: 18px;
+            font-size: $nrFontSize;
             font-family: monospace;
+            
 
             color: white;
             padding-top: 30px;
             width: 15px;
             color: $numbersColor;
             /* background-color: red; */
-            @each $n in 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25 {
-                $amt:360/24*$n - 2;
+            @each $n in 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24 {
+                $amt:360/24*$n - 3;
                 &:nth-child(#{$n}){
                     transform: rotate($amt+deg);
                     span{
-                        line-height: 1px;
                         display:block;
+                        border-radius: 25%; 
                         transform:rotate( (-$amt)+deg);
+                        background-color: $numbersBackgroundColor;
+                        color: $numbersColor;
                     }
                 }
+                &:nth-child(odd) {
+                    span {
+                        display: none;
+                    }
+                    
+                }
+                /* 
+                 * span.nr18 {
+                 *     margin-right: 5px;
+                 * }
+                 * span.nr6 {
+                 *     margin-left: 5px;
+                 * }
+                 */
+
             }
         }
 
@@ -255,12 +264,12 @@ $h: 360px;
           position: absolute;
           bottom: 50%;
           left: 50%;
-          height: 40%;
+          height: 38%;
           width: 4px;
           margin-left: 4px;
           transform-origin: bottom center;
           border-radius: 3px 3px 0 0;
-          background-color: rgba($clockhandSecondColorAmbient, .2);
+          background-color: rgba($clockhandSecondColorAmbient, .5);
           
           z-index: 49;
           &.isAmbient {
@@ -274,7 +283,7 @@ $h: 360px;
 
 
       .secBg {
-          height: 47%;
+          height: 41%;
           margin-left: 2px;
       }
       .hourBg {
@@ -290,7 +299,7 @@ $h: 360px;
           position: absolute;
           bottom: 50%;
           left: 50%;
-          height: 40%;
+          height: 38%;
           width: 4px;
           margin-left: -2px;
           background: $accentCol;
@@ -314,7 +323,7 @@ $h: 360px;
           box-shadow: 0 0 2px 2px $highlightColor;
       }
       .sec{
-          height: 46%;
+          height: 41%;
           width: 1px;
           margin-left: 0;
           box-shadow: 0 0 1px 1px $clockhandSecondColor;
@@ -325,6 +334,10 @@ $h: 360px;
                   background-color: $ambientStepColor;
 
               }
+          }
+          .numbers .nr span {
+              color: $ambientNumbersColor;
+              background-color: $numbersAmbientBackgroundColor;
           }
       }
   }

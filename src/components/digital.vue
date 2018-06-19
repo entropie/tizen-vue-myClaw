@@ -21,7 +21,6 @@ export default {
     , data() {
         return {
             time: Date.now(),
-            clockInterval: undefined,
             min: "00",
             sec: "00",
             hour: "00",
@@ -40,13 +39,10 @@ export default {
         }
     }
     , beforeDestroy() {
-        if(this.clockInterval) {
-            clearInterval(this.clockInterval);
-        }
     }
     , watch: {
         isAmbient(o, n) {
-            this.clockUpdater(this)();
+            this.clockUpdater();
         }
     }
     , methods: {
@@ -81,28 +77,23 @@ export default {
             return "/static/img/48/" + n + add + ".gif";
         }
         ,
-        clockUpdater(that) {
-            let u = function() {
-                let t = that;
-                var date = t.$parent.time
+        clockUpdater() {
+            let t = this;
+            var date = t.$parent.time
 
-                t.hour = t.padString(date.getHours());
-                t.min  = t.padString(date.getMinutes());
-                t.sec  = t.padString(date.getSeconds());
+            t.hour = t.padString(date.getHours());
+            t.min  = t.padString(date.getMinutes());
+            t.sec  = t.padString(date.getSeconds());
 
-                t.hours = t.toImages(t.hour.split(""));
-                t.mins  = t.toImages(t.min.split(""), true);
-                t.secs  = t.toImages(t.sec.split(""), false);
-            }
-            return u;
+            t.hours = t.toImages(t.hour.split(""));
+            t.mins  = t.toImages(t.min.split(""), true);
+            t.secs  = t.toImages(t.sec.split(""), false);
         }
-        , updateClock(){
-            setInterval(this.clockUpdater(this), 1000);  
+        , update() {
+            this.clockUpdater();
         }
     }
     , created() {
-        let t = this;
-        this.updateClock();
 
     }
 }
@@ -114,12 +105,15 @@ export default {
     position: absolute;
     z-index: 5;
     width: 360px;
-    top: 55%;
+    top: 236px;
     text-align: center;
 }
 
-.secs img {
+.hour img, .mins img {
     max-width: 32px;
+}
+.secs img {
+    max-width: 24px;
     z-index: 99;
 }
 
