@@ -76,7 +76,7 @@ export default {
             if(!size)
                 size = 48;
             
-            return "/static/img/48/" + n + add + ".gif";
+            return "./static/img/48/" + n + add + ".gif";
         }
         ,
         clockUpdater() {

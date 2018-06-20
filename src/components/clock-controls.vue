@@ -98,6 +98,7 @@ export default {
             counting: false,
             interval: 100,
             counterForceShow: false,
+            pStepsDefault: 24 + (24*4),
             pSteps: 24,
             pStepsH: 24,
             cSteps: 0,
@@ -142,7 +143,7 @@ export default {
     , methods: {
         ackro() {
             let add = this.isAmbient ? "bw" : "";
-            return "/static/img/ackro" + add  + ".gif";
+            return "./static/img/ackro" + add  + ".gif";
         }
         , setRotarySetterFunction(ev) {
             ev.detail.direction === 'CW' ? this.increment() : this.decrement()
@@ -151,7 +152,6 @@ export default {
             this.counting = true;
             this.$refs.countdown.start();
             this.pSteps = this.countDownTime / 1000;
-
         }
         ,
         increment() {
@@ -203,7 +203,11 @@ export default {
         countdownProgress(data) {
             let totalSecs = (data.minutes * 60) + Math.round(data.seconds);
             let rsecs = Math.abs(this.pSteps - totalSecs)
+            if(this.worker) {
+                this.worker.postMessage(rsecs);
+            }
             this.cSteps = rsecs;
+
         }
         ,
         update() {
@@ -323,7 +327,6 @@ export default {
     .mbtn, span {
         display: inline-block;
         height: 20px;
-        color: #777;
         cursor: pointer;
         height: 40px;
         flex-grow: 1;
@@ -333,6 +336,8 @@ export default {
     .countdown span {
         width: 60px;
         display: inline-block;
+        color: $countdownColor;
+        text-shadow: $countdownTextShadow;
     }
 }
 </style>

@@ -70,7 +70,7 @@ export default {
         ,
         moment: function() {
             return moment(this.time);
-        }        
+        }
     }
     , methods: {
         tizenTime: function() {
@@ -102,7 +102,7 @@ export default {
             this.showAnalogCLock =  sv.showAnalogCLock;
             this.showCircle =       sv.showCircle;
             this.showDate =         sv.showDate;
-            this.showAckro =         sv.showAckro;
+            this.showAckro =        sv.showAckro;
         }
         ,
         addListener: function() {
@@ -113,14 +113,17 @@ export default {
             document.addEventListener("timetick", function() {
                 t.time = t.tizenTime();
             });
-            
-            document.addEventListener("visibilitychange", function() {
+
+            // countdown would sleep otherwise during device sleep
+            if(typeof tizen !== 'undefined') {
+                if(tizen.power) {
+                    tizen.power.request("CPU", "CPU_AWAKE");
+                }
+            }
+
+            window.addEventListener("visibilitychange", function() {
                 if (!document.hidden) {
-                    if (t.isAmbient === true) {
-                        t.$store.state.isAmbient = true;
-                    } else {
-                        t.$store.state.isAmbient = false;
-                    }
+                    t.time = t.tizenTime();
                 }
             });
 
