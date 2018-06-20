@@ -117,7 +117,7 @@ export default {
             // countdown would sleep otherwise during device sleep
             if(typeof tizen !== 'undefined') {
                 if(tizen.power) {
-                    tizen.power.request("CPU", "CPU_AWAKE");
+                    //tizen.power.request("CPU", "CPU_AWAKE");
                 }
             }
 

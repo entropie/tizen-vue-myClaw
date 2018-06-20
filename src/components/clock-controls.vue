@@ -98,7 +98,7 @@ export default {
             counting: false,
             interval: 100,
             counterForceShow: false,
-            pStepsDefault: 24 + (24*4),
+            pStepsDefault: 24,
             pSteps: 24,
             pStepsH: 24,
             cSteps: 0,
@@ -191,7 +191,7 @@ export default {
             this.counting = false;
             this.$refs.countdown.init();
             this.countDownTime = this.countDownTimeDefault;
-            this.pSteps = 24;
+            this.pSteps = this.pStepsDefault;
             this.cSteps = 0;
         }
         ,
@@ -212,6 +212,16 @@ export default {
         ,
         update() {
             let hs = this.$parent.time.getHours();
+
+            // let mins = 41;
+            // let mod = 0;
+            // if(mins > 45) {
+            //     mod = 6;
+            // } else if(mins > 30) {
+            //     mod = 4;
+            // } else if(mins > 15) {
+            //     mod = 2;
+            // }
             if(!this.counting) {
                 this.cSteps = hs;
             }
