@@ -5,7 +5,7 @@
                          :completed-steps="cSteps"
                          :total-steps="pSteps"
                          timingFunc="linear"
-                         stopColor="#00000)"
+                         stopColor="#8c8c8c"
                          startColor="#6ab551"
                          innerStrokeColor="#000000"
                          :strokeWidth=strokeWidth>
@@ -28,27 +28,27 @@
     <span>{{ day }} {{ monthDay }}</span>
   </div>
 
+
+  <div class="resetter" v-if="counting || counterForceShow">
+    <span v-on:click="stopAndReset"></span>
+  </div>
+
+  <div class="setter">
+    <span v-on:click="$parent.changeClock()"></span>
+  </div>
+  
+  <div class="ackro">
+    <div class="ackrocon" v-if="showAckro">
+      <img :src="ackro()">
+    </div>
+  </div>
+
+
+
   <div id="clock-controls">
-
     <span style="display:inline-block;width:40px; height:40px;" v-on:click="$store.state.isAmbient = !$store.state.isAmbient"></span>
-
-
-    <div class="resetter" v-if="counting || counterForceShow">
-      <span v-on:click="stopAndReset"></span>
-    </div>
-    <div class="ackro">
-      <div class="ackrocon" v-if="showAckro">
-        <img :src="ackro()" v-on:click="$parent.changeClock()">
-      </div>
-      <div class="ackrodummy" v-else>
-        <span v-on:click="$parent.changeClock()"></span>
-      </div>
-    </div>
-    
     <div class="counter">
-
       <span class="mbtn" href="#" v-on:click="decrement" v-if="counterForceShow"></span>
-
       <countdown class="countdown"
                  :time="countDownTime"
                  id="countdown"
@@ -67,8 +67,6 @@
       </countdown>
 
       <span class="mbtn" href="#" v-on:click="increment"  v-if="counterForceShow"></span>
-
-
     </div>
 
   </div>
@@ -105,7 +103,7 @@ export default {
             cSteps: 0,
             cStepsH: 0,
             cStep: 0,
-            diameter: 360,
+            diameter: 354,
             strokeWidth: 5,
             incrementStep: 1 * 30 * 1000
         }
@@ -162,6 +160,9 @@ export default {
         ,
         decrement() {
             this.countDownTime -= this.incrementStep;
+            if(this.countDownTime <= 0) {
+                this.countDownTime = this.incrementStep;
+            }
         }
         ,
         stopCounter() {
@@ -219,18 +220,15 @@ export default {
 
 <style lang="scss" scoped>
 
-$dateColor: #54db11;
-$dateAmbientColor: #e8e8e8;
-$dateBackgroundColor: #515151;
-$dateBorderColor: #848484;
+@import '../variables.sass';
 
 #clock-controls, #progress-bar, #clock-date {
     text-align: center;
     position: absolute;
     top: 0;
     left: 0;
-    width: 360px;
-    height: 360px;
+    width: $w;
+    height: $w;
     z-index: 99;
 }
 
@@ -238,17 +236,17 @@ $dateBorderColor: #848484;
     text-align: left;
     z-index: 1;
     span {
-        box-shadow: inset 1px 1px 2px 0px rgba(0,0,0,0.75), 1px 1px 2px 0px #565656;
-        text-shadow: 1px 1px 1px rgba(0, 0, 0, 1);
+        box-shadow: $dateBoxShadow;
+        text-shadow: $dateTextShadow;
         background-color: $dateBackgroundColor;
         display: inline-block;
-        margin-top: 168px;
-        margin-left: calc(50% + 50px);
+        margin-top: 170px;
+        margin-left: calc(50% + 107px);
         color: $dateColor;
         border-radius: 15%;
         padding: 3px;
-        font-size: 14px;
-        border: 1px solid $dateBorderColor;
+        font-size: $dateFontSize;
+        font-family: monospace;
     }
     &.ambient {
         span {
@@ -259,6 +257,9 @@ $dateBorderColor: #848484;
 
 #progress-bar {
     z-index: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
 #countdown {
@@ -268,14 +269,15 @@ $dateBorderColor: #848484;
 
 .ackro {
     position: absolute;
-    top: 145px;
+    top: 75px;
     left: 0;
     width: 100%;
     height: 20px;
     text-align: center;
+    z-index: 20;
     img {
         z-index: 90;
-        max-height: 52px;
+        max-height: 42px;
     }
     .ackrodummy span {
         display: inline-block;
@@ -288,7 +290,7 @@ $dateBorderColor: #848484;
     top: 145px;
     position: absolute;
     width: 100%;
-    z-index: 90;
+    z-index: 1000;
     span {
         display: inline-block;
         width: 52px;
@@ -296,13 +298,27 @@ $dateBorderColor: #848484;
         cursor: pointer;
     }
 }
+.setter {
+    top: 65px;
+    position: absolute;
+    width: 100%;
+    z-index: 1000;
+    span {
+        display: inline-block;
+        width: 52px;
+        height: 52px;
+        cursor: pointer;
+    }
+
+    }
+
 .counter {
     display: flex;
     align-content: center;
     justify-content: center;
     height: 40px;
     position: absolute;
-    top: 290px;
+    top: 280px;
     width: 100%;
     .mbtn, span {
         display: inline-block;

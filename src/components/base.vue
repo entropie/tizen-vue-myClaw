@@ -1,9 +1,12 @@
 <template>
-<div id="clocks">
-  <digital-clock v-if="showDigitalClock" ref="dclock"></digital-clock>
-  <analog-clock v-if="showAnalogCLock"   ref="aclock"></analog-clock>
-  <heart-rate v-if="showHeartRate"></heart-rate>
-  <clock-controls v-if="showClockControls" ref="cclock" :showCircle=showCircle :showDate=showDate :showAckro=showAckro></clock-controls>
+  <div id="base">
+    <div id="clockBg" v-bind:class="{ambient: isAmbient}"></div>
+    <div id="clocks">
+      <digital-clock v-if="showDigitalClock" ref="dclock"></digital-clock>
+      <analog-clock v-if="showAnalogCLock"   ref="aclock"></analog-clock>
+      <heart-rate v-if="showHeartRate"></heart-rate>
+      <clock-controls v-if="showClockControls" ref="cclock" :showCircle=showCircle :showDate=showDate :showAckro=showAckro></clock-controls>
+    </div>
 </div>
 </template>
 
@@ -134,3 +137,21 @@ export default {
 }
 </script>
 
+
+<style lang="scss" scoped>
+@import '../variables.sass';
+
+#clockBg {
+    position: absolute;
+    background: $background;
+    border-radius: 50%;
+    height: $h;
+    width: $w;
+    z-index: 1;
+    &.ambient {
+        background-color: #000;
+        background: #000;
+    }
+}
+
+</style>

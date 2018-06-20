@@ -1,14 +1,16 @@
 <template>
 <div id="digital-clock-box">
-  <span class="hour" v-for="h in hours">
-    <img :src="h">
-  </span>
-  <span class="mins" v-for="m in mins">
-    <img :src="m">
-  </span>
-  <span class="secs" v-for="s in secs" v-if="!isAmbient">
-    <img :src="s">
-  </span>
+  <div class="digital-view" v-bind:class="{ambient: isAmbient}">
+    <span class="hour" v-for="h in hours">
+      <img :src="h">
+    </span>
+    <span class="mins" v-for="m in mins">
+      <img :src="m">
+    </span>
+    <span class="secs" v-for="s in secs" v-if="!isAmbient">
+      <img :src="s">
+    </span>
+  </div>
 </div>
 </template>
 
@@ -99,21 +101,39 @@ export default {
 }
 </script>
 
-<style type="sass" scoped>
+<style lang="scss">
 
-#digital-clock-box {
+@import '../variables.sass';
+
+
+#digital-clock-box{
     position: absolute;
     z-index: 5;
     width: 360px;
-    top: 236px;
+    top: 233px;
     text-align: center;
 }
 
+.digital-view{
+    opacity: .7;
+    background-color: red;
+    display: inline-block;
+    padding: 5px;
+    background-color: $digitalViewBackgroundColor;
+    border: $digitalViewBorder;
+    border-radius: $digitalViewBorderRadius;
+    box-shadow: $digitalViewBoxShadow;
+    width: ($digitalImgSize * 4) + ($digitilImgSecsSize * 2) + 10;
+    &.ambient { 
+        width: ($digitalImgSize * 4) + 10;
+    }
+}
+
 .hour img, .mins img {
-    max-width: 32px;
+    max-width: $digitalImgSize;
 }
 .secs img {
-    max-width: 24px;
+    max-width: $digitilImgSecsSize;
     z-index: 99;
 }
 

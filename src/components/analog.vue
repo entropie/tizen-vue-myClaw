@@ -1,8 +1,7 @@
 <template>
 <div id="analog-clock">
   <div class="clock"  v-bind:class="{ambient: isAmbient}">
-
-    <div class="numbers">
+    <div class="numbers" v-bind:class="{nodate: !$parent.showDate}">
       <div class="nr" v-for="n in numbers">
         <span :class="'nr' + n">{{ n }}</span>
       </div>
@@ -40,12 +39,9 @@ export default {
     , data() {
         return {
             appTitle: 'Vue Clock',
-            hour: '--',
-            hourDeg: '0deg',
-            mins: '--',
-            minsDeg: '0deg',
-            secs: '--',
-            secsDeg: '0deg',
+            hourDeg: '0',
+            minsDeg: '0',
+            secsDeg: '0',
             numbers: [1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,0]
             
         }
@@ -88,47 +84,14 @@ export default {
 
 <style lang="scss" scoped>
 
-$font-display: 'Libre Barcode 39 Text', cursive;
-$font-text: 'Asap', sans-serif;
-
-$foobar: rgb(1,1,1);
-$white: #fff;
-$black: #000;
-$background: transparent;
-$clock-col: rgb(200, 200, 200);
-$accentCol: rgba(0, 0, 0, .5);
-$shadowColor: rgba(13, 45, 15, .5);
-
-
-$dOpacity: 1;
-$stepColor: green;
-$stepColor1: transparent;
-
-$highlightColor: rgb(116, 188, 45);
-$ambientColor: #AAA;
-$ambientStepColor: rgb(109, 109, 109);
-$ambientShadowColor: #555;
-
-$clockhandSecondColor: rgb(255, 187, 0);
-$clockhandSecondColorAmbient: rgb(104, 76, 0);
-
-$numbersColor: green;
-$ambientNumbersColor: black;
-$numbersBackgroundColor: #222;
-$numbersAmbientBackgroundColor: #666;
-
-$nrFontSize: 10px;
-
-$w: 360px;
-$h: 360px;
+@import '../variables.sass';
         
 *, *::before, *::after{
   box-sizing: border-box;
 }
 
 #analog-clock {
-  color: $foobar;
-  background: $background;
+  background: $containerBackgroundColor;
   display: flex;
   justify-content: center;
   align-items: center;
@@ -140,7 +103,6 @@ $h: 360px;
     height: $h;
     border-radius: 50%;
     overflow: hidden;    
-    z-index: 10;
     &:before{
         content: '';
         position: absolute;
@@ -152,6 +114,7 @@ $h: 360px;
         z-index: 99;
         border-radius: 50%;
         background-color: black;
+        background: $analogDotBackground;
     }
     .stepsbox {
         position: relative;
@@ -168,25 +131,27 @@ $h: 360px;
             position: absolute;
             height: $h/2;
             transform-origin: 0 100%;
-            font-size: $nrFontSize;
-            font-family: monospace;
-            
-
-            color: white;
-            padding-top: 30px;
-            width: 15px;
-            color: $numbersColor;
-            /* background-color: red; */
+            font-size: $analogNumbersFontSize;
+            font-family: $analogNumbersFontFamily;;
+            padding-top: 35px;
             @each $n in 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24 {
-                $amt:360/24*$n - 3;
+                $amt:360/24*$n - 6;
                 &:nth-child(#{$n}){
                     transform: rotate($amt+deg);
                     span{
+                        border: $analogNumbersBorder;
+                        box-shadow: $analogNumbersBoxShadow;
+                        text-shadow: $analogNumbersTextShadow;
+                        width: 30px;
                         display:block;
-                        border-radius: 25%; 
+                        border-radius: 25%;
+                        padding: 3px;
                         transform:rotate( (-$amt)+deg);
-                        background-color: $numbersBackgroundColor;
-                        color: $numbersColor;
+                        background-color: $analogNumbersBackgroundColor;
+                        color: $analogNumbersColor;
+                        &.nr6 {
+                            display: none;
+                        }
                     }
                 }
                 &:nth-child(odd) {
@@ -195,19 +160,16 @@ $h: 360px;
                     }
                     
                 }
-                /* 
-                 * span.nr18 {
-                 *     margin-right: 5px;
-                 * }
-                 * span.nr6 {
-                 *     margin-left: 5px;
-                 * }
-                 */
-
             }
         }
 
     }
+    .nodate {
+        .nr6 {
+            display: block !important;
+        }
+    }
+
     .steps{
         position: absolute;
         top: 0;
@@ -222,9 +184,12 @@ $h: 360px;
             left: 2px;
             width: 1px;
             height: 10px;
-            background: $stepColor1;
+            background: $analogAncentColor;
             border-radius: 1px;
-            opacity: $dOpacity;
+            opacity: $analogAncentOpacity;
+            margin-top: 7px;
+            margin-bottom: 7px;
+            z-index: 1000;
         }
           &::before{
               top: .5rem;
@@ -234,7 +199,10 @@ $h: 360px;
           }
           &:nth-child(1){
               &::before, &::after{
-                  background: $stepColor;
+                  background: $analogAncentColorMain;
+                  margin-top: 7px;
+                  margin-bottom: 7px;
+
               }
           }
           &:nth-child(2){ transform: rotate(30deg); }
@@ -242,7 +210,10 @@ $h: 360px;
           &:nth-child(4){ 
               transform: rotate(90deg);
               &::before, &::after{
-                  background: $stepColor;
+                  background: $analogAncentColorMain;
+                  margin-top: 7px;
+                  margin-bottom: 7px;
+
               }
           }
           &:nth-child(5){ transform: rotate(120deg); }
@@ -254,7 +225,6 @@ $h: 360px;
           top: 6rem;
           left: 50%;
           transform: translateX(-50%);
-          font-family: $font-display;
           font-size: 2.6em;
           opacity: .5;
       }
@@ -269,32 +239,34 @@ $h: 360px;
           margin-left: 4px;
           transform-origin: bottom center;
           border-radius: 3px 3px 0 0;
-          background-color: rgba($clockhandSecondColorAmbient, .5);
-          
-          z-index: 49;
+          z-index: 20;
+          opacity: .5;
           &.isAmbient {
               opacity: .3;
           }
       }
       .minBg, .hourBg {
-          background-color: rgba($highlightColor, .3);
       }
-
-
-
       .secBg {
-          height: 41%;
+          background-color: $analogNeedleSecondsShadowColor;
+          height: $analogNeedleSecLength;
           margin-left: 2px;
       }
       .hourBg {
           height: 24%;
+          height: $analogNeedleHourLength;
           width: 6px;
           margin-left: 3px;
+          background-color: $analogNeedleShadowColor;
+      }
+      .minBg {
+          background-color: $analogNeedleShadowColor;
+          height: $analogNeedleMinLength;
       }
       .hour,
       .min,
       .sec{
-          opacity: $dOpacity;
+          opacity: $analogNeedleOpacity;
           z-index: 10;
           position: absolute;
           bottom: 50%;
@@ -302,42 +274,44 @@ $h: 360px;
           height: 38%;
           width: 4px;
           margin-left: -2px;
-          background: $accentCol;
           transform-origin: bottom center;
           border-radius: 3px 3px 0 0;
           z-index: 50;
-
+          background-color: $analogNeedleBackgroundColor;
           &.isAmbient {
-              background-color: $ambientColor;
+              background-color: $analogNeedleAmbientColor;
               box-shadow: none;
           }
 
       }
       .hour{
-          height: 23%;
+          height: $analogNeedleHourLength;                    
           width: 6px;
           margin-left: -3px;
-          box-shadow: 0 0 2px 2px $highlightColor;
+          box-shadow: 0 0 2px 2px $analogNeedleColor; 
       }
       .min{
-          box-shadow: 0 0 2px 2px $highlightColor;
+          height: $analogNeedleMinLength;
+          box-shadow: 0 0 2px 2px $analogNeedleColor; 
       }
       .sec{
-          height: 41%;
+          height: $analogNeedleSecLength;
           width: 1px;
           margin-left: 0;
-          box-shadow: 0 0 1px 1px $clockhandSecondColor;
+          box-shadow: 0 0 1px 1px $analogNeedleSecondsColor;
+          background-color: $analogNeedleSecondsBackgroundColor;
       }
       &.ambient {
           .a {
               &:before, &::after{
-                  background-color: $ambientStepColor;
+                  background-color: $analogAncentAmbientColor;
 
               }
           }
           .numbers .nr span {
-              color: $ambientNumbersColor;
-              background-color: $numbersAmbientBackgroundColor;
+              color: $analogNumbersAmbientColor;
+              background-color: $analogNumbersAmbientBackgroundColor;
+
           }
       }
   }
