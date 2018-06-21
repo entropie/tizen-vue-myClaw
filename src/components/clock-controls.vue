@@ -1,5 +1,9 @@
 <template>
-<div class="foo">
+
+<div class="clock-controls-box">
+  <div id="stopwatch">{{ workerValue }}</div>
+
+
   <div id="progress-bar" v-if="showCircle && !isAmbient">
     <radial-progress-bar :diameter=diameter
                          :completed-steps="cSteps"
@@ -58,7 +62,7 @@
                  v-on:countdownprogress="countdownProgress"
                  :interval=interval>
         <template slot-scope="props">
-          <span class="mbt" v-on:click="toggleCounter" v-bind:class="{active: counterForceShow}" v-if="(counterForceShow  && !isAmbient) || (counting && !isAmbient)">
+          <span class="mbt" v-on:click="toggleCounter" v-bind:class="{active: counterForceShow}" v-if="(counterForceShow  && !isAmbient) && !counting"> 
             {{ props.hours == "00" ? "" : props.hours + ":"}}{{ props.minutes == "00" ? "" : props.minutes + ":"}}{{ props.seconds }}
           </span>
           <span class="mbtn" v-else v-on:click="counterForceShow = !counterForceShow">
@@ -106,7 +110,8 @@ export default {
             cStep: 0,
             diameter: 354,
             strokeWidth: 5,
-            incrementStep: 1 * 30 * 1000
+            incrementStep: 1 * 30 * 1000,
+            workerValue: 0
         }
     }
     , components: {
@@ -135,11 +140,11 @@ export default {
     }
     , watch: {
         counterForceShow(o, n) {
-            if(this.counterForceShow) {
-                document.addEventListener('rotarydetent', this.setRotarySetterFunction);
-            } else {
-                document.removeEventListener('rotarydetent', this.setRotarySetterFunction);
-            }
+            // if(this.counterForceShow) {
+            //     document.addEventListener('rotarydetent', this.setRotarySetterFunction);
+            // } else {
+            //     document.removeEventListener('rotarydetent', this.setRotarySetterFunction);
+            // }
         },
         time(o,n) {
             this.update();
@@ -157,6 +162,29 @@ export default {
             this.counting = true;
             this.$refs.countdown.start();
             this.pSteps = this.countDownTime / 1000;
+            this.createWorker();
+        }
+        , createWorker() {
+            this.terminateWorker();
+            this.worker = new Worker("/static/stopwatch.js");
+            let t = this;
+            this.worker.onmessage = function(ev) {
+                let current = ev.data.current, started = ev.data.started;
+                let passedSecs = Math.round(((current - started) / 1000));
+                let maxSecs = t.countDownTime /1000;
+                t.cSteps = t.workerValue = passedSecs;
+
+                if(passedSecs >= maxSecs) {
+                    t.stopAndReset();
+                    t.$parent.vibrate();
+                };
+            }
+            return this.worker;
+        }
+        , terminateWorker() {
+            if(this.worker) {
+                this.worker.terminate();
+            }
         }
         ,
         increment() {
@@ -198,11 +226,10 @@ export default {
             this.countDownTime = this.countDownTimeDefault;
             this.pSteps = this.pStepsDefault;
             this.cSteps = 0;
+            this.terminateWorker();
         }
         ,
         done(){
-            navigator.vibrate(1000, 200);
-            this.resetCounter();
         }
         ,
         countdownProgress(data) {
@@ -211,8 +238,7 @@ export default {
             if(this.worker) {
                 this.worker.postMessage(rsecs);
             }
-            this.cSteps = rsecs;
-
+            // this.cSteps = rsecs;
         }
         ,
         update() {
@@ -249,6 +275,16 @@ export default {
     width: $w;
     height: $w;
     z-index: 99;
+}
+
+#stopwatch {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: $w;
+    height: 30px;
+    z-index: 99;
+    display: none;
 }
 
 #clock-date {

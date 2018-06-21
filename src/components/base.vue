@@ -68,6 +68,9 @@ export default {
         }
     }
     , methods: {
+        vibrate: function() {
+            navigator.vibrate([1000, 100, 100, 5000]);
+        },
         tizenTime: function() {
             if (typeof tizen === 'undefined') {
                 return new Date();
