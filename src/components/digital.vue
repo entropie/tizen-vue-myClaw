@@ -22,7 +22,7 @@ export default {
 
     , data() {
         return {
-            time: Date.now(),
+            // time: Date.now(),
             min: "00",
             sec: "00",
             hour: "00",
@@ -38,6 +38,9 @@ export default {
     , computed: {
         isAmbient() {
             return this.$store.state.isAmbient;
+        },
+        time() {
+            return this.$parent.time;
         }
     }
     , beforeDestroy() {
@@ -45,12 +48,15 @@ export default {
     , watch: {
         isAmbient(o, n) {
             this.clockUpdater();
+        },
+
+        time(o,n) {
+            this.update();
         }
     }
     , methods: {
         now() {
-            console.log(moment(this.$parent.time));
-            return moment(this.$parent.time)
+            return moment(this.time)
         }
         , padString(str) {
             return ("00" + str).substr(-2,2);

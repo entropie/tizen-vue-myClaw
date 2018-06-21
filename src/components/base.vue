@@ -49,14 +49,9 @@ export default {
     }
     , mounted() {
         let t = this;
-
         this.clockInterval = setInterval(() => {
             t.time = t.tizenTime();
-            this.$refs.dclock && this.$refs.dclock.update();
-            this.$refs.aclock && this.$refs.aclock.update();
-            this.$refs.cclock && this.$refs.cclock.update();
         }, 1000);
-
     }
     , beforeDestroy() {
         if(this.clockInterval) {

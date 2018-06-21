@@ -51,6 +51,14 @@ export default {
     , computed: {
         isAmbient: function() {
             return this.$store.state.isAmbient;
+        },
+        time() {
+            return this.$parent.time;
+        }
+    }
+    , watch: {
+        time(o,n) {
+            this.update();
         }
     }
     , beforeDestroy() {
@@ -58,7 +66,7 @@ export default {
     , methods: {
         clockUpdater() {
             let t = this;
-            var date = t.$parent.time,
+            var date = t.time,
                 hour = date.getHours(),
                 min = date.getMinutes(),
                 sec = date.getSeconds();

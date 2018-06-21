@@ -126,6 +126,9 @@ export default {
         },
         monthDay: function() {
             return this.$parent.moment.format("D");
+        },
+        time: function() {
+            return this.$parent.time;
         }
     }
     , created() {
@@ -137,8 +140,10 @@ export default {
             } else {
                 document.removeEventListener('rotarydetent', this.setRotarySetterFunction);
             }
+        },
+        time(o,n) {
+            this.update();
         }
-
     }
     , methods: {
         ackro() {
