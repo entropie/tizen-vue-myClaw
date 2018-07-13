@@ -69,6 +69,7 @@ export default {
     }
     , methods: {
         vibrate: function() {
+            tizen.power.turnScreenOn();
             navigator.vibrate([1000, 100, 100, 5000]);
         },
         tizenTime: function() {
