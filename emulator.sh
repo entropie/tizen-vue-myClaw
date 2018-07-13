@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
 
+node build/build.js
+
 tizen=/home/mit/tizen-studio/tools/ide/bin/tizen
 sdb=/home/mit/tizen-studio/tools/sdb
 cd tizen

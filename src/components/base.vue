@@ -1,6 +1,6 @@
 <template>
   <div id="base">
-    <div id="clockBg" v-bind:class="{ambient: isAmbient}"></div>
+    <div id="clockBg" v-bind:class="[{ambient: isAmbient}, variant]"></div>
     <div id="clocks">
       <digital-clock v-if="showDigitalClock" ref="dclock"></digital-clock>
       <analog-clock v-if="showAnalogCLock"   ref="aclock"></analog-clock>
@@ -32,6 +32,8 @@ export default {
             time: this.tizenTime(),
             clockInterval: undefined,
             sIndex: 0,
+            variants: ["v1", "v2", "v3", "v4"],
+            variant: "v1",
             sets: [
                 { showAnalogCLock: true, showDigitalClock: true,  showCircle: true, showDate: true },
                 { showAnalogCLock: true, showDigitalClock: true,  showCircle: true, showDate: false },
@@ -70,7 +72,7 @@ export default {
     , methods: {
         vibrate: function() {
             tizen.power.turnScreenOn();
-            navigator.vibrate([1000, 100, 100, 5000]);
+            navigator.vibrate(5000);
         },
         tizenTime: function() {
             if (typeof tizen === 'undefined') {
@@ -82,12 +84,19 @@ export default {
         ,
 
         changeClock: function() {
-            let newInd = this.sIndex += 1;
-            let set = this.sets[newInd];
-            if(!set) {
-                set = this.sets[0];
-            }
-            this.setSet(set);
+            let newInd  = this.variants.indexOf(this.variant) + 1;
+            let variant = this.variants[newInd];
+            if(!variant)
+                variant = this.variants[0];
+
+            this.variant = variant;
+            // let newInd = this.sIndex += 1;
+            // let set = this.sets[newInd];
+            // if(!set) {
+            //     set = this.sets[0];
+            // }
+            // this.setSet(set);
+            
         }
         ,
         setList: function() {
@@ -145,15 +154,27 @@ export default {
 
 #clockBg {
     position: absolute;
-    background: $background;
-    border-radius: 50%;
+
     height: $h;
     width: $w;
     z-index: 1;
+
+    &.v1 {
+        background: $background1;
+    }
+    &.v2 {
+        background: $background2;
+    }
+    &.v3 {
+        background: $background3;
+    }
+    &.v4 {
+        background: $background4;
+    }
     &.ambient {
         background-color: #000;
         background: #000;
-    }
+    }    
 }
 
 </style>

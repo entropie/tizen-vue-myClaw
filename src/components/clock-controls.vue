@@ -158,6 +158,20 @@ export default {
         , setRotarySetterFunction(ev) {
             ev.detail.direction === 'CW' ? this.increment() : this.decrement()
         }
+        // , createNotification() {
+        //     var notification,
+        //         notificationDict;
+        //     try {
+        //         notificationDict = {
+        //             content: "Bzt bZt!",
+        //             iconPath: this.ackro()
+        //         };
+        //         notification = new tizen.StatusNotification("SIMPLE", "Notification Manager", notificationDict);
+        //         tizen.notification.post(notification);
+        //     } catch (err) {
+        //         console.log(err.name + ": " + err.message);
+        //     }
+        // }
         , startCounter() {
             this.counting = true;
             this.$refs.countdown.start();
@@ -166,7 +180,7 @@ export default {
         }
         , createWorker() {
             this.terminateWorker();
-            this.worker = new Worker("/static/stopwatch.js");
+            this.worker = new Worker("./static/stopwatch.js");
             let t = this;
             this.worker.onmessage = function(ev) {
                 let current = ev.data.current, started = ev.data.started;
