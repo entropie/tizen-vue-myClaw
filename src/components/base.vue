@@ -70,9 +70,20 @@ export default {
         }
     }
     , methods: {
-        vibrate: function() {
-            tizen.power.turnScreenOn();
-            navigator.vibrate(5000);
+        vibrate: function(pattern) {
+            if(!pattern) 
+                pattern = 3000;
+
+            if(typeof tizen !== 'undefined') {
+                tizen.power.request('SCREEN', 'SCREEN_NORMAL');
+                tizen.power.turnScreenOn();
+
+                setTimeout(function (){
+                    navigator.vibrate(pattern);
+                    tizen.power.release('SCREEN');
+                }, 1000);
+            }
+            return true;
         },
         tizenTime: function() {
             if (typeof tizen === 'undefined') {
@@ -90,13 +101,6 @@ export default {
                 variant = this.variants[0];
 
             this.variant = variant;
-            // let newInd = this.sIndex += 1;
-            // let set = this.sets[newInd];
-            // if(!set) {
-            //     set = this.sets[0];
-            // }
-            // this.setSet(set);
-            
         }
         ,
         setList: function() {

@@ -9,9 +9,10 @@
                          :completed-steps="cSteps"
                          :total-steps="pSteps"
                          timingFunc="linear"
-                         stopColor="#8c8c8c"
-                         startColor="#6ab551"
-                         innerStrokeColor="#000000"
+                         stopColor="darkgreen"
+                         startColor="green"
+                         innerStrokeColor="transparent"
+                         :animateSpeed=1000
                          :strokeWidth=strokeWidth>
     </radial-progress-bar>
   </div>
@@ -24,6 +25,7 @@
                          stopColor="rgb(0, 0, 0)"
                          startColor="rgb(155, 155, 155)"
                          innerStrokeColor="#000000"
+                         :animateSpeed=1000
                          :strokeWidth=strokeWidth>
     </radial-progress-bar>
   </div>
@@ -111,7 +113,8 @@ export default {
             diameter: 354,
             strokeWidth: 5,
             incrementStep: 1 * 30 * 1000,
-            workerValue: 0
+            workerValue: 0,
+            alarm: false
         }
     }
     , components: {
@@ -158,6 +161,27 @@ export default {
         , setRotarySetterFunction(ev) {
             ev.detail.direction === 'CW' ? this.increment() : this.decrement()
         }
+        , createAlarm() {
+            if(typeof tizen !== 'undefined') {
+
+                // var appControl = new tizen.ApplicationControl('http://tizen.org/appcontrol/operation/default',
+                //                                               null, 'image/jpg', null);
+                // var notificationDict = {
+                //     content: 'This is a simple notification\'s content.',
+                //     actions: {
+                //         vibration: true,
+                //         appId: tizen.application.getCurrentApplication().appInfo.id,
+                //         appControl: appControl
+                //     },
+                // };
+
+                // var notification = new tizen.UserNotification('SIMPLE', 'Simple notification\'s title',
+                //                                               notificationDict);
+
+                this.alarm = new tizen.AlarmRelative(this.countDownTime);
+                tizen.alarm.add(this.alarm, tizen.application.getCurrentApplication().appInfo.id);
+            }
+        }
         // , createNotification() {
         //     var notification,
         //         notificationDict;
@@ -193,6 +217,7 @@ export default {
                     t.$parent.vibrate();
                 };
             }
+            this.alarm = this.createAlarm();
             return this.worker;
         }
         , terminateWorker() {
@@ -257,16 +282,6 @@ export default {
         ,
         update() {
             let hs = this.$parent.time.getHours();
-
-            // let mins = 41;
-            // let mod = 0;
-            // if(mins > 45) {
-            //     mod = 6;
-            // } else if(mins > 30) {
-            //     mod = 4;
-            // } else if(mins > 15) {
-            //     mod = 2;
-            // }
             if(!this.counting) {
                 this.cSteps = hs;
             }
@@ -320,6 +335,7 @@ export default {
     &.ambient {
         span {
             color: $dateAmbientColor;
+            background-color: $dateAmbientBackgroundColor;
         }
     }
 }
@@ -336,10 +352,14 @@ export default {
     flex-grow: 0;
 }
 
-.ackro {
+@mixin sPos() {
     position: absolute;
-    top: 75px;
-    left: 0;
+    top: calc(50% - 25px);
+    right: calc(50% - 100px);
+}
+
+.ackro {
+    @include sPos();
     width: 100%;
     height: 20px;
     text-align: center;
@@ -370,6 +390,7 @@ export default {
 .setter {
     top: 65px;
     position: absolute;
+    @include sPos();
     width: 100%;
     z-index: 1000;
     span {

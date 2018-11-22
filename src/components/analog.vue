@@ -141,7 +141,7 @@ export default {
             transform-origin: 0 100%;
             font-size: $analogNumbersFontSize;
             font-family: $analogNumbersFontFamily;;
-            padding-top: 35px;
+            padding-top: 30px;
             @each $n in 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24 {
                 $amt:360/24*$n - 6;
                 &:nth-child(#{$n}){
@@ -192,24 +192,21 @@ export default {
             left: 2px;
             width: 1px;
             height: 10px;
-            background: $analogAncentColor;
             border-radius: 1px;
-            opacity: $analogAncentOpacity;
-            margin-top: 7px;
             margin-bottom: 7px;
             z-index: 1000;
         }
           &::before{
-              top: .5rem;
+              top: 8px;
           }
           &::after{
-              bottom: .5rem;
+              bottom: 5px;
           }
           &:nth-child(1){
               &::before, &::after{
                   background: $analogAncentColorMain;
-                  margin-top: 7px;
-                  margin-bottom: 7px;
+                  margin-top: 8px;
+                  margin-bottom: 8px;
 
               }
           }
@@ -219,8 +216,8 @@ export default {
               transform: rotate(90deg);
               &::before, &::after{
                   background: $analogAncentColorMain;
-                  margin-top: 7px;
-                  margin-bottom: 7px;
+                  margin-top: 5px;
+
 
               }
           }
@@ -279,7 +276,6 @@ export default {
           position: absolute;
           bottom: 50%;
           left: 50%;
-          height: 38%;
           width: 4px;
           margin-left: -2px;
           transform-origin: bottom center;
