@@ -193,20 +193,27 @@ export default {
             width: 1px;
             height: 10px;
             border-radius: 1px;
-            margin-bottom: 7px;
+            margin-bottom: 4px;
             z-index: 1000;
         }
           &::before{
-              top: 8px;
+              top: 12px;
           }
           &::after{
-              bottom: 5px;
+              bottom: 8px;
+          }
+          &::before, &::after {
+              background: green;
+              /*
+               * margin-top: 8px;
+               * margin-bottom: 8px;
+               */
+              height: 3px;
+              border-radius: 50%
           }
           &:nth-child(1){
               &::before, &::after{
                   background: $analogAncentColorMain;
-                  margin-top: 8px;
-                  margin-bottom: 8px;
 
               }
           }
@@ -216,13 +223,17 @@ export default {
               transform: rotate(90deg);
               &::before, &::after{
                   background: $analogAncentColorMain;
-                  margin-top: 5px;
-
 
               }
           }
           &:nth-child(5){ transform: rotate(120deg); }
           &:nth-child(6){ transform: rotate(150deg); }
+          &:nth-last-child(6) {
+              &::before, &::after{
+                  background: $analogAncentColorMain;
+
+              }
+          }
 
       }
       .display{
@@ -306,7 +317,7 @@ export default {
           background-color: $analogNeedleSecondsBackgroundColor;
       }
       &.ambient {
-          .a {
+          .steps {
               &:before, &::after{
                   background-color: $analogAncentAmbientColor;
 

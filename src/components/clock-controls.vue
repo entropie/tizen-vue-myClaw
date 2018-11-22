@@ -143,11 +143,6 @@ export default {
     }
     , watch: {
         counterForceShow(o, n) {
-            // if(this.counterForceShow) {
-            //     document.addEventListener('rotarydetent', this.setRotarySetterFunction);
-            // } else {
-            //     document.removeEventListener('rotarydetent', this.setRotarySetterFunction);
-            // }
         },
         time(o,n) {
             this.update();
@@ -183,20 +178,6 @@ export default {
             }
 
         }
-        // , createNotification() {
-        //     var notification,
-        //         notificationDict;
-        //     try {
-        //         notificationDict = {
-        //             content: "Bzt bZt!",
-        //             iconPath: this.ackro()
-        //         };
-        //         notification = new tizen.StatusNotification("SIMPLE", "Notification Manager", notificationDict);
-        //         tizen.notification.post(notification);
-        //     } catch (err) {
-        //         console.log(err.name + ": " + err.message);
-        //     }
-        // }
         , startCounter() {
             this.counting = true;
             this.$refs.countdown.start();
@@ -342,7 +323,10 @@ export default {
     &.ambient {
         span {
             color: $dateAmbientColor;
+            text-shadow: $dateTextShadow;
             background-color: $dateAmbientBackgroundColor;
+            border: $analogNumbersBorder;
+
         }
     }
 }
