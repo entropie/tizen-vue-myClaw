@@ -177,10 +177,11 @@ export default {
 
                 // var notification = new tizen.UserNotification('SIMPLE', 'Simple notification\'s title',
                 //                                               notificationDict);
-
-                this.alarm = new tizen.AlarmRelative(this.countDownTime);
-                tizen.alarm.add(this.alarm, tizen.application.getCurrentApplication().appInfo.id);
+                
+                // this.alarm = new tizen.AlarmRelative(this.countDownTime / 1000 - 5);
+                // tizen.alarm.add(this.alarm, tizen.application.getCurrentApplication().appInfo.id);
             }
+
         }
         // , createNotification() {
         //     var notification,
@@ -204,8 +205,14 @@ export default {
         }
         , createWorker() {
             this.terminateWorker();
+
+            if (typeof tizen !== 'undefined') {
+                tizen.power.request("CPU", "CPU_AWAKE");
+            }
+
             this.worker = new Worker("./static/stopwatch.js");
             let t = this;
+
             this.worker.onmessage = function(ev) {
                 let current = ev.data.current, started = ev.data.started;
                 let passedSecs = Math.round(((current - started) / 1000));
@@ -217,7 +224,7 @@ export default {
                     t.$parent.vibrate();
                 };
             }
-            this.alarm = this.createAlarm();
+            // this.alarm = this.createAlarm();
             return this.worker;
         }
         , terminateWorker() {

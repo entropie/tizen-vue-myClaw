@@ -79,7 +79,8 @@ export default {
                 tizen.power.turnScreenOn();
 
                 setTimeout(function (){
-                    navigator.vibrate(pattern);
+                    navigator.vibrate([pattern, pattern]);
+                    tizen.power.release('CPU');
                     tizen.power.release('SCREEN');
                 }, 1000);
             }
