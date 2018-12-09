@@ -1,5 +1,17 @@
 <template>
-<div id="digital-clock-box">
+<div id="digital-box">
+  <div id="toggle-counter"><strong v-on:click="toggleCounter()">&nbsp;</strong></div>
+  <div id="counter-toggler-box">
+    <span class="reset" v-if="counterActive"><strong v-on:click="resetCounter()">&nbsp;</strong></span>
+    <span class="overlay" v-if="counterActive"><strong v-on:click="dynamicEventButton()">&nbsp;</strong></span>
+    <span class="start" v-if="counterActive"><strong v-on:click="startCounter()">&nbsp;</strong></span>
+  </div>
+  
+  <div id="counter-box" v-if="counterActive && !isAmbient">
+    <div class="counter-box-content" v-html="counterToImages(counterTime)" v-on:click="dynamicEvent()" />
+  </div>
+
+<div id="digital-clock-box" v-if="!counterActive || isAmbient">
   <div class="digital-view" v-bind:class="{ambient: isAmbient}">
     <span class="hour" v-for="h in hours">
       <img :src="h">
@@ -12,10 +24,12 @@
     </span>
   </div>
 </div>
+</div>
 </template>
 
 <script>
 import moment from 'moment';
+import momentDurationFormatSetup from "moment-duration-format";
 
 export default {
     name: "digital-clock"
@@ -29,7 +43,10 @@ export default {
 
             hours: [],
             mins: [],
-            secs: []            
+            secs: [],
+            counterActive: false,
+            startedAt: false,
+            workerValue: 0
         }
     }
     , created(){
@@ -41,6 +58,15 @@ export default {
         },
         time() {
             return this.$parent.time;
+        },
+        counterTime() {
+            if(this.workerValue && this.workerValue != 0) {
+                let ret = moment.duration(this.workerValue * 1000).format("h:mm:ss");
+                return ret;
+            } else {
+                return "00";
+            }
+            
         }
     }
     , beforeDestroy() {
@@ -55,6 +81,53 @@ export default {
         }
     }
     , methods: {
+        counterToImages(str) {
+            var splitted = str.split(":");
+            let s = splitted.map(x => this.toImages(x.split("")).map(x => "<img src='" + x + "' />").join("")   )
+            return s.join("");
+        }
+        ,
+        
+        toggleCounter() {
+            this.counterActive = !this.counterActive;
+        }
+        ,
+        startCounter() {
+            if(this.worker)
+                return false;
+            
+            this.worker = new Worker("./static/stopwatch.js");
+            let t = this;
+
+            this.worker.onmessage = function(ev) {
+                let current = ev.data.current, started = ev.data.started;
+                let passedSecs = Math.round(((current - started) / 1000));
+                t.cSteps = t.workerValue = passedSecs;
+            }
+            return this.worker;
+        },
+
+        dynamicEventButton() {
+            if(this.workerValue > 0) {
+                this.resetAndClose();
+            } else {
+                this.startCounter();
+            }
+        }
+        ,
+        resetAndClose() {
+            this.resetCounter();
+            this.counterActive = false;
+        }
+        ,
+        resetCounter() {
+            this.workerValue = 0;
+            if(this.worker) {
+                this.worker.terminate();
+                this.worker = false;
+            }
+        }
+        ,
         now() {
             return moment(this.time)
         }
@@ -111,6 +184,91 @@ export default {
 
 @import '../variables.sass';
 
+#toggle-counter {
+    position: absolute;
+    top: 170px;
+    z-index: 2000;
+    right: 47%;
+    left: 47%;
+    strong {
+        width: 30px;
+        display: inline-block;
+    }
+}
+
+
+#counter-toggler-box {
+    position: absolute;
+    top: 0;
+    z-index: 1001;
+    width: 100%;
+    top: 233px;
+    height: 40px;
+    .reset {
+        position: absolute;
+        left: 0;
+        strong {
+            display: inline-block;
+            width: 100px;
+            height: 40px;
+        }                      
+    }
+    .start {
+        position: absolute;
+        right: 0;
+        strong {
+            display: inline-block;
+            width: 100px;
+            height: 40px;
+        }
+    }
+    .overlay {
+        position: absolute;
+        left: 100px;
+        right: 100px;
+        strong {
+            display: inline-block;
+            width: ($digitalImgSize * 4) + ($digitilImgSecsSize * 2) + 10;
+            height: 40px;
+        }
+    }
+    .toggle {
+        position: absolute;
+        width: 100%;
+        top: -65px;
+        strong {
+            display: inline-block;
+            width: 30px;
+            height: 30px;
+        }
+    }
+}
+#counter-box {
+    background-color: rgba(0,1000,0, .5);
+    position: absolute;
+    top: 0;
+    width: 100%;
+    z-index: 5;
+    top: 233px;
+    text-align: center;
+    .counter-box-content {
+        position: absolute;
+        top: 0;
+        left: 100px;
+        background-color: $digitalViewBackgroundColor;
+        width: ($digitalImgSize * 4) + ($digitilImgSecsSize * 2) + 10;
+    background-color: $digitalViewBackgroundColor;
+    border: $digitalViewBorder;
+    border-radius: $digitalViewBorderRadius;
+    box-shadow: $digitalViewBoxShadow;
+
+        padding: 5px;
+    }
+    img {
+        max-width: $digitalImgSize;
+    }
+}
+
 
 #digital-clock-box{
     position: absolute;
@@ -122,7 +280,6 @@ export default {
 
 .digital-view{
     opacity: .7;
-    background-color: red;
     display: inline-block;
     padding: 5px;
     background-color: $digitalViewBackgroundColor;

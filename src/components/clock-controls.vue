@@ -42,6 +42,10 @@
   <div class="setter">
     <span v-on:click="$parent.changeClock()"></span>
   </div>
+
+
+  <cucumber-counter-system>
+  </cucumber-counter-system>
   
   <div class="ackro">
     <div class="ackrocon" v-if="showAckro">
@@ -82,6 +86,8 @@
 <script>
 
 import RadialProgressBar from 'vue-radial-progress'
+import CucumberCounterSystem from './cucumber-counter-system'
+
 
 export default {
     name: "clock-controls",
@@ -118,7 +124,7 @@ export default {
         }
     }
     , components: {
-        RadialProgressBar
+        RadialProgressBar, CucumberCounterSystem
     }    
     , computed: {
         isAmbient: function() {
@@ -156,28 +162,6 @@ export default {
         , setRotarySetterFunction(ev) {
             ev.detail.direction === 'CW' ? this.increment() : this.decrement()
         }
-        , createAlarm() {
-            if(typeof tizen !== 'undefined') {
-
-                // var appControl = new tizen.ApplicationControl('http://tizen.org/appcontrol/operation/default',
-                //                                               null, 'image/jpg', null);
-                // var notificationDict = {
-                //     content: 'This is a simple notification\'s content.',
-                //     actions: {
-                //         vibration: true,
-                //         appId: tizen.application.getCurrentApplication().appInfo.id,
-                //         appControl: appControl
-                //     },
-                // };
-
-                // var notification = new tizen.UserNotification('SIMPLE', 'Simple notification\'s title',
-                //                                               notificationDict);
-                
-                // this.alarm = new tizen.AlarmRelative(this.countDownTime / 1000 - 5);
-                // tizen.alarm.add(this.alarm, tizen.application.getCurrentApplication().appInfo.id);
-            }
-
-        }
         , startCounter() {
             this.counting = true;
             this.$refs.countdown.start();
@@ -205,7 +189,6 @@ export default {
                     t.$parent.vibrate();
                 };
             }
-            // this.alarm = this.createAlarm();
             return this.worker;
         }
         , terminateWorker() {
@@ -313,7 +296,7 @@ export default {
         background-color: $dateBackgroundColor;
         display: inline-block;
         margin-top: 170px;
-        margin-left: calc(50% + 107px);
+        margin-left: calc(50% + 119px);
         color: $dateColor;
         border-radius: 15%;
         padding: 3px;
@@ -351,13 +334,15 @@ export default {
 
 .ackro {
     @include sPos();
-    width: 100%;
     height: 20px;
     text-align: center;
     z-index: 20;
+    top: 85px;
+    right: 124px;
     img {
         z-index: 90;
-        max-height: 42px;
+        max-height: 142px;
+        opacity: .5;
     }
     .ackrodummy span {
         display: inline-block;
@@ -370,7 +355,7 @@ export default {
     top: 145px;
     position: absolute;
     width: 100%;
-    z-index: 1000;
+    z-index: 990;
     span {
         display: inline-block;
         width: 52px;
