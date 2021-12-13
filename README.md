@@ -1,3 +1,3 @@
 # tizen-vue-myClaw
 
-[Demo](http://wecoso.org/~mit/stuff/myClaw/)
+[Demo](https://wecoso.org/~mit/stuff/myClaw/)
